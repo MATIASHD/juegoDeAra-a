@@ -10,11 +10,39 @@ public class Bala {
 	private int balaY;
 	private int direccion;
 	
-	public Bala(int x, int y, int direccion) 
+	public Bala(int x, int y) 
 	{
 		this.balaX = x;
 		this.balaY = y;
+	}
+	
+	//Getter and Setter
+	public int getBalaX() {
+		return balaX;
+	}
+
+	public void setBalaX(int balaX) {
+		this.balaX = balaX;
+	}
+
+	public int getBalaY() {
+		return balaY;
+	}
+
+	public void setBalaY(int balaY) {
+		this.balaY = balaY;
+	}
+
+	public int getDireccion() {
+		return direccion;
+	}
+
+	public void setDireccion(int direccion) {
 		this.direccion = direccion;
+	}
+	
+	void disparo() {
+		this.balaX += 2;
 	}
 	
 	public void dibujarBala (Entorno entorno) 
@@ -22,24 +50,21 @@ public class Bala {
 		entorno.dibujarRectangulo(balaX, balaY, 3, 3, 0, Color.RED);
 	}
 	
-	public void movimientoBala()
+	public void movimientoBala(int direccion)
 	{
-		switch (direccion) 
-		{
-		case 0:
-				this.balaY -= 2;
-				System.out.println("BALA Y" + balaY);
-			break;
-		case 1:
+		if (direccion == 0 || direccion == 2 ) {
+			if (direccion == 2) {
 				this.balaX += 2;
-			break;
-		case 2:
-			this.balaY += 2;
-			break;
-		case 3:
+			} else {
 				this.balaX -= 2;
-		default:
-			break;
+			}
+		} 
+		if (direccion == 1 || direccion == 3 ) {
+			if (direccion == 1) {
+				this.balaY += 2;
+			} else {
+				this.balaY -= 2;
+			}
 		}
 	}
 	

@@ -5,57 +5,45 @@ import entorno.Entorno;
 public class Edificio {
 	
 	//viriables de instancia
-	private double edificioX;
-	private double edificioY;
-	private double anchoEdificio;
-	private double altoEdificio;
+	private int edificioX;
+	private int edificioY;
+	private int anchoEdificio = 150;
+	private int altoEdificio = 100;
 	
-	public Edificio (double X, double Y, double ancho, double largo) {
+	public Edificio (int X, int Y) {
 		this.edificioX = X;
 		this.edificioY = Y;
-		this.anchoEdificio = ancho;
-		this.altoEdificio = largo;
 	}
-	
-	
 	//Getter and Setters
 	
-	public double getEdificioX() {
+	public int getEdificioX() {
 		return edificioX;
 	}
 
-	public void setEdificioX(double edificioX) {
+	public void setEdificioX(int edificioX) {
 		this.edificioX = edificioX;
 	}
 
-	public double getEdificioY() {
+	public int getEdificioY() {
 		return edificioY;
 	}
 
-	public void setEdificioY(double edificioY) {
+	public void setEdificioY(int edificioY) {
 		this.edificioY = edificioY;
 	}
-
-	public double getAnchoEdificio() {
+	
+	public int getAnchoEdificio() {
 		return anchoEdificio;
 	}
-
-	public void setAnchoEdificio(double anchoEdificio) {
-		this.anchoEdificio = anchoEdificio;
-	}
-
-	public double getAltoEdificio() {
+	
+	public int getAltoEdificio() {
 		return altoEdificio;
-	}
-
-	public void setAltoEdificio(double altoEdificio) {
-		this.altoEdificio = altoEdificio;
 	}
 	
 	
 	void dibujarEdificio(Entorno entorno) 
 	{
-		entorno.dibujarRectangulo(getEdificioX(), getEdificioY(), getAnchoEdificio(), getAltoEdificio(), 0, Color.MAGENTA);
+		entorno.dibujarRectangulo(getEdificioX(), getEdificioY(), this.anchoEdificio, this.altoEdificio, 0, Color.MAGENTA);
 	}
 	
 	//Cantidad de edificio debe ser entre 4 y 8

@@ -8,19 +8,18 @@ public class Mina {
 	//variable de instancia
 	private double minaX;
 	private double minaY;
-	private double anchoMina;
-	private double largoMina;
+	private double anchoMina = 20;
+	private double largoMina = 50;
 	
-	public Mina (double X, double Y, double ancho, double largo) {
+	public Mina (double X, double Y) {
 		minaX = X;
 		minaY = Y;
-		anchoMina = ancho;
-		largoMina = largo;
 	}
 	
 	void dibujarBomba (Entorno entorno) {
 		entorno.dibujarRectangulo(minaX, minaY, anchoMina, largoMina, 0, Color.ORANGE);
 	}
+
 	
 	//Bombas puede dejarla donde esta el personaje
 	//Cuando la araña toca la bomba estalla

@@ -1,5 +1,8 @@
 package juego;
 
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 //import java.awt.Color;
 
@@ -10,35 +13,46 @@ public class Juego extends InterfaceJuego
 {
 	// El objeto Entorno que controla el tiempo y otros
 	private Entorno entorno;
-	Exterminador heroe;
-	Araña[] arana;
-	Edificio[] edificios;
-	Pics pics;
-	private int direccion;
-	public Bala bala;
-	private int lateralesReservado;
+	private Exterminador heroe;
+	private Araña[] arana;
+	private Edificio[] edificios;
+	private Pics pics;
+	private ArrayList<Bala> balas = new ArrayList<Bala>();
+	private Mina [] minas;
+	private Edificio edificioPrueba;
+	private Araña aranaPrueba;
 	// Variables y métodos propios de cada grupo
 	// ...
-	int tiempo = 0;
-	int limiteTiempo = 50;
+	private int direccion;
+	private int tiempo;
+	private int limite;
+	private int cantidadBala;
+	private int lateralesReservado;
+
 	String tiempoTextos = "";
 	
 	
 	Juego()
 	{
 		// Inicializa el objeto entorno
-		this.entorno = new Entorno(this, "Prueba del entorno", 800, 600);
+		this.entorno = new Entorno(this, "Prueba del entorno", 1024, 600);
 		pics = new Pics();
 		// Inicializar lo que haga falta para el juego
 		// ...
 		
-		this.heroe = new Exterminador(400,500);
-		this.arana = new Araña[50];
+		this.heroe = new Exterminador(512,300);
+		this.arana = new Araña[8];
 		this.crearArana(this.arana);
 		this.edificios = new Edificio[8];
 		this.crearEdificios(this.edificios);
-		direccion = 0;
-		lateralesReservado = 20;
+		this.minas = new Mina[15];
+		this.edificioPrueba = new Edificio(200, 300);
+		this.aranaPrueba = new Araña( 800,560);
+		this.direccion = 0;
+		this.lateralesReservado = 20;
+		this.tiempo = 0;
+		this.limite = 50;
+		this.cantidadBala = 0;
 		// Inicia el juego!
 		this.entorno.iniciar();
 	}
@@ -55,9 +69,27 @@ public class Juego extends InterfaceJuego
 		// ...
 		//Si toca la araña o la bomba, agregar
 			//Nuestro objet
-			
-		accionesExterminador();	
-		
+		if(!heroe.colicionConArana(aranaPrueba) && !cuentaRegresiva()) {
+			accionesExterminador();	
+			edificioPrueba.dibujarEdificio(entorno);
+			aranaPrueba.dibujarArana(entorno);				
+			this.dibujarTiempo();
+			recorrerList(balas, entorno);
+			if(!this.balas.isEmpty()) {
+				this.trayectoBala();
+			}
+			tiempo++;
+			cuentaRegresiva();
+				
+			//System.out.println(entorno.ancho());
+		} else {
+			//El exterminador perdio la vida
+			entorno.dibujarImagen(pics.perdio, 512, 300, 0);
+		}
+		 //El exterminador Gano la partida
+		if(cuentaRegresiva()) {
+			entorno.dibujarImagen(pics.gano, 512, 300, 0);
+		}	
 			
 	}
 		
@@ -80,23 +112,16 @@ public class Juego extends InterfaceJuego
 	}
 	
 	void dibujarArana(Araña[] arana) {
-		for(int i = 0; i < arana.length; i++) {
-			arana[i].dibujarArana(entorno);
+			for(int i = 0; i < arana.length; i++) {
+				arana[i].dibujarArana(entorno);
+			}
 		}
-	}
 	
-	//bombas
-	void crearBombas(Mina[] bombas) {
-		int ejeX = 20;
-		for(int i = 0; i < bombas.length; i++) {
-			bombas[i] = new Mina(ejeX,325, 20,20);
-			ejeX += 80;
-		}
-	}
-	
-	void dibujarBombas(Mina[] bombas) {
-		for(int i = 0; i < bombas.length; i++) {
-			bombas[i].dibujarBomba(entorno);
+	void recorrerList(ArrayList<Bala> a, Entorno entorno) {
+		Iterator<Bala> it = a.iterator();
+		while(it.hasNext()) {
+			Bala item = it.next();
+			item.dibujarBala(entorno);
 		}
 	}
 	
@@ -105,7 +130,7 @@ public class Juego extends InterfaceJuego
 		int largoX = 80;
 		int largoY = 200;
 		for(int i =0; i < edificios.length; i++) {
-			edificios[i] = new Edificio(largoX,largoY,78,98);
+			edificios[i] = new Edificio(largoX,largoY);
 			
 			if (i >= 4) {
 				largoX -= 200;
@@ -126,13 +151,12 @@ public class Juego extends InterfaceJuego
 	{
 		this.heroe.dibujarExterminador(entorno);
 		movimientosExterminador();
-		exterminadorDispara();
+	
 	}
 	
 	//Movimientos termineitor
 	private void movimientosExterminador () 
 	{
-		
 		if ( entorno.sePresiono(entorno.TECLA_DERECHA) )
 		{	
 			if(direccion <= 3)
@@ -151,25 +175,50 @@ public class Juego extends InterfaceJuego
 				direccion = 3;
 		}
 		
-		if(entorno.estaPresionada(entorno.TECLA_ARRIBA))
-			heroe.caminar(direccion);
+		if (entorno.sePresiono(entorno.TECLA_ESPACIO)) {
+			
+					Bala bala = (Bala) this.crearBala();
+					balas.add(bala);
+					System.out.println("entro");
+
+				
+		}
+		heroe.caminar(direccion, entorno, edificioPrueba);
+			
 	}
 	
-	private void exterminadorDispara()
-	{
-		bala = heroe.disparar(direccion, entorno);
-		bala.movimientoBala();
-		bala.dibujarBala(entorno);
+	public Bala crearBala () {
+		Bala balaCreando = new Bala(heroe.getCuadradoX(),heroe.getCuadradoY());
+		return balaCreando;	
 	}
 	
-	/*
-	void dibujarTiempo(int tiempo) {
-		tiempoTexto = Integer.toString(tiempo); 
-		entorno.cambiarFont(tiempoTexto, 40, Color.ORANGE);
-		entorno.escribirTexto(tiempoTexto, 700, 50);
+	void trayectoBala () {
+		for (int i = 0; i < this.balas.size(); i++) {
+			Bala recorreBala = (Bala) this.balas.get(i);
+			int posicion = recorreBala.getBalaX();
+			
+			recorreBala.setBalaX(posicion += 5);
+		}
+	}
+	
+	void dibujarTiempo() {
+		
+		tiempoTextos = Integer.toString(limite);
+		entorno.cambiarFont(tiempoTextos, 40, Color.BLUE);
+		entorno.escribirTexto(tiempoTextos, 700, 50);
 		
 	}
-	*/
+	
+	public boolean cuentaRegresiva() {
+		if (tiempo >= 100) {
+			limite -= 1;
+			tiempo = 0;
+		}
+		if (limite == -1) {
+			return true;
+		}
+		return false;
+	}
 	
 	public int getLateralesReservado() {
 		return lateralesReservado;
